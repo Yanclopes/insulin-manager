@@ -19,18 +19,16 @@ class DefaultFirebaseOptions {
     }
   }
 
-  // Configuração para Web
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: "AIzaSyCAufK0pXbl2YdX9gqepIomGnxS6jWAs7c",
     authDomain: "insulin-manager-app.firebaseapp.com",
     projectId: "insulin-manager-app",
     storageBucket: "insulin-manager-app.appspot.com",
     messagingSenderId: "509163642435",
-    appId: "1:509163642435:web:xxxxxxxxxxxxxxxxxx", // Substitua pelo App ID Web se disponível
-    measurementId: "G-XXXXXXXXXX", // Opcional
+    appId: "1:509163642435:web:xxxxxxxxxxxxxxxxxx",
+    measurementId: "G-XXXXXXXXXX",
   );
 
-  // Configuração para Android
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: "AIzaSyCAufK0pXbl2YdX9gqepIomGnxS6jWAs7c",
     appId: "1:509163642435:android:87ac511bcfe469b871bef6",
@@ -39,13 +37,13 @@ class DefaultFirebaseOptions {
     storageBucket: "insulin-manager-app.appspot.com",
   );
 
-  // Configuração para iOS (adicione se criar o app iOS no Firebase)
+  // TODO Configuração para iOS 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: "AIzaSyCAufK0pXbl2YdX9gqepIomGnxS6jWAs7c",
-    appId: "1:509163642435:ios:xxxxxxxxxxxxxxxxxx", // Substitua pelo App ID iOS
+    appId: "1:509163642435:ios:xxxxxxxxxxxxxxxxxx", 
     messagingSenderId: "509163642435",
     projectId: "insulin-manager-app",
     storageBucket: "insulin-manager-app.appspot.com",
-    iosBundleId: "com.unidavi.insulinmanager", // Bundle ID iOS
+    iosBundleId: "com.unidavi.insulinmanager",
   );
 }

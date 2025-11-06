@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // PERMITE que qualquer um crie um documento na coleção 'users',
+    // DESDE QUE o 'uid' do documento seja o mesmo do usuário
+    // que está se cadastrando.
+    match /users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Permite que o usuário logado leia ou atualize seus próprios dados
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // (Aqui virão suas outras regras para patients, cases, etc.)
+  }
+}

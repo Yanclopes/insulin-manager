@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'login_page.dart';
+import 'package:insulinmanager/core/widgets/auth_wrapper.dart';
+import 'firebase_options.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,14 +12,16 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Insulin Manager',
-      debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
+      title: 'SBD-Assist',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const AuthWrapper(),
     );
   }
 }

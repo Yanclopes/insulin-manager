@@ -6,7 +6,9 @@ class PatientService {
       FirebaseFirestore.instance.collection('patients');
 
   Stream<List<PatientModel>> getAllPatientsStream() {
-    return _patientsCollection.snapshots().map((snapshot) {
+    return _patientsCollection
+        .snapshots()
+        .map((snapshot) {
       try {
         return snapshot.docs
             .map((doc) =>
@@ -17,5 +19,27 @@ class PatientService {
         return [];
       }
     });
+  }
+
+  Future<void> addPatient(PatientModel patient) async {
+    try {
+      DocumentReference docRef = _patientsCollection.doc();
+      Map<String, dynamic> patientData = patient.toMap();
+      patientData['id'] = docRef.id;
+      await docRef.set(patientData);
+
+    } catch (e) {
+      print("Erro ao adicionar paciente: $e");
+      throw Exception("Falha ao salvar paciente.");
+    }
+  }
+
+  Future<void> updatePatient(PatientModel patient) async {
+    try {
+      await _patientsCollection.doc(patient.id).update(patient.toMap());
+    } catch (e) {
+      print("Erro ao atualizar paciente: $e");
+      throw Exception("Falha ao atualizar paciente.");
+    }
   }
 }

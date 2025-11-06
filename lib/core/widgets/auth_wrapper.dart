@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:insulinmanager/core/widgets/user_role_dispatcher.dart';
+import 'package:insulinmanager/features/patient_list_page.dart';
 import 'package:insulinmanager/loading_screen.dart';
 import 'package:insulinmanager/login_page.dart';
-
 import '../services/auth_service.dart';
 
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({Key? key}) : super(key: key);
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,7 @@ class AuthWrapper extends StatelessWidget {
           return const LoadingScreen();
         }
         if (snapshot.hasData) {
-          return const UserRoleDispatcher();
+          return const PatientListPage();
         }
         return const LoginPage();
       },

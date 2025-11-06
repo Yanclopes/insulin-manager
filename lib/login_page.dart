@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:insulinmanager/core/widgets/user_role_dispatcher.dart';
+import 'package:insulinmanager/core/widgets/auth_wrapper.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const UserRoleDispatcher()),
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {

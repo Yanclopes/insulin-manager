@@ -7,9 +7,11 @@ class PatientModel {
   final String gender;
   final num weight;
   final num height;
-  final bool eat;
   final String diabetesType;
   final Timestamp createdAt;
+
+  final num a1c;
+  final String renalFunctionStatus;
 
   PatientModel({
     required this.id,
@@ -18,9 +20,10 @@ class PatientModel {
     required this.gender,
     required this.height,
     required this.weight,
-    required this.eat,
     required this.diabetesType,
     required this.createdAt,
+    required this.a1c,
+    required this.renalFunctionStatus,
   });
 
   factory PatientModel.fromMap(Map<String, dynamic> data) {
@@ -30,10 +33,11 @@ class PatientModel {
       age: data['age'] as int,
       weight: data['weight'] as num,
       height: data['height'] as num,
-      eat: data['eat'] as bool,
       gender: data['gender'] as String,
       diabetesType: data['diabetesType'] as String,
       createdAt: data['createdAt'] as Timestamp,
+      a1c: data['a1c'] as num,
+      renalFunctionStatus: data['renalFunctionStatus'] as String,
     );
   }
 
@@ -43,11 +47,12 @@ class PatientModel {
       'name': name,
       'age': age,
       'gender': gender,
-      'eat': eat,
       'height': height,
       'weight': weight,
       'diabetesType': diabetesType,
       'createdAt': createdAt,
+      'a1c': a1c,
+      'renalFunctionStatus': renalFunctionStatus,
     };
   }
 }

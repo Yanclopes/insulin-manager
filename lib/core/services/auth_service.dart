@@ -12,7 +12,6 @@ class AuthService {
     required String name,
     required String email,
     required String password,
-    required UserType userType,
     String? hospitalId, 
   }) async {
     try {
@@ -27,8 +26,6 @@ class AuthService {
           uid: user.uid,
           name: name,
           email: email,
-          type: userType,
-          hospitalId: hospitalId,
           createdAt: Timestamp.now(),
           active: true,
         );

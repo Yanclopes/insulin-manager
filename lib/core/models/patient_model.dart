@@ -5,8 +5,9 @@ class PatientModel {
   final String name;
   final int age;
   final String gender;
-  final String responsibleDoctorId;
-  final String hospitalId;
+  final num weight;
+  final num height;
+  final bool eat;
   final String diabetesType;
   final Timestamp createdAt;
 
@@ -15,8 +16,9 @@ class PatientModel {
     required this.name,
     required this.age,
     required this.gender,
-    required this.responsibleDoctorId,
-    required this.hospitalId,
+    required this.height,
+    required this.weight,
+    required this.eat,
     required this.diabetesType,
     required this.createdAt,
   });
@@ -26,9 +28,10 @@ class PatientModel {
       id: data['id'] as String,
       name: data['name'] as String,
       age: data['age'] as int,
+      weight: data['weight'] as num,
+      height: data['height'] as num,
+      eat: data['eat'] as bool,
       gender: data['gender'] as String,
-      responsibleDoctorId: data['responsibleDoctorId'] as String,
-      hospitalId: data['hospitalId'] as String,
       diabetesType: data['diabetesType'] as String,
       createdAt: data['createdAt'] as Timestamp,
     );
@@ -40,8 +43,9 @@ class PatientModel {
       'name': name,
       'age': age,
       'gender': gender,
-      'responsibleDoctorId': responsibleDoctorId,
-      'hospitalId': hospitalId,
+      'eat': eat,
+      'height': height,
+      'weight': weight,
       'diabetesType': diabetesType,
       'createdAt': createdAt,
     };

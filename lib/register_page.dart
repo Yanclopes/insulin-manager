@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:insulinmanager/core/models/user_model.dart';
 import 'package:insulinmanager/core/services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -16,8 +15,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-
-  UserType _selectedUserType = UserType.patient; 
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -47,7 +44,6 @@ class _RegisterPageState extends State<RegisterPage> {
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text,
-        userType: _selectedUserType,
       );
       
       if (!mounted) return;

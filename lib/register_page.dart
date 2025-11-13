@@ -11,6 +11,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final AuthService _authService = AuthService();
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -18,19 +19,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _register() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      setState(() {
-        _errorMessage = 'As senhas não coincidem';
-      });
-      return;
-    }
-
-    if (_nameController.text.isEmpty) {
-      setState(() {
-        _errorMessage = 'Por favor, insira seu nome completo';
-      });
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -47,13 +49,25 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       
       if (!mounted) return;
-      
-      Navigator.pop(context); 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Conta criada com sucesso! Faça o login."),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context);
 
     } on FirebaseAuthException catch (e) {
-      setState(() {
+      if (e.code == 'email-already-in-use') {
+        _errorMessage = "Este e-mail já está cadastrado.";
+      } else if (e.code == 'weak-password') {
+        _errorMessage = "A senha deve ter no mínimo 6 caracteres.";
+      } else if (e.code == 'invalid-email') {
+         _errorMessage = "O formato do e-mail é inválido.";
+      } else {
         _errorMessage = e.message ?? "Ocorreu um erro";
-      });
+      }
+      setState(() {});
     } catch (e) {
       setState(() {
         _errorMessage = "Ocorreu um erro desconhecido: $e";
@@ -67,72 +81,160 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  InputDecoration _buildInputDecoration({
+    required String labelText,
+    required IconData icon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      labelText: labelText,
+      prefixIcon: Icon(icon),
+      suffixIcon: suffixIcon,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Cadastro')),
+      appBar: AppBar(
+        title: const Text('Criar Nova Conta'),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        foregroundColor: theme.colorScheme.primary,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nome Completo'),
-              keyboardType: TextInputType.name,
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Senha'),
-              obscureText: true,
-            ),
-            TextField(
-              controller: _confirmPasswordController,
-              decoration: const InputDecoration(labelText: 'Confirmar Senha'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-
-            /**
-             * adicionar futuramente
-             * 
-             * Text("Você é:", style: Theme.of(context).textTheme.titleMedium),
-            RadioListTile<UserType>(
-              title: const Text("Paciente"),
-              value: UserType.patient,
-              groupValue: _selectedUserType,
-              onChanged: (value) {
-                if (value != null) setState(() => _selectedUserType = value);
-              },
-            ),
-            RadioListTile<UserType>(
-              title: const Text("Médico"),
-              value: UserType.doctor,
-              groupValue: _selectedUserType,
-              onChanged: (value) {
-                if (value != null) setState(() => _selectedUserType = value);
-              },
-            ),
-             */
-
-            const SizedBox(height: 20),
-            if (_errorMessage != null)
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.red),
+                "Preencha seus dados",
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _register,
-                    child: const Text('Criar Conta'),
+              const SizedBox(height: 8),
+              Text(
+                "Crie sua conta profissional para acessar o sistema.",
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 32),
+
+              TextFormField(
+                controller: _nameController,
+                decoration: _buildInputDecoration(
+                  labelText: 'Nome Completo',
+                  icon: Icons.person_outline,
+                ),
+                keyboardType: TextInputType.name,
+                textCapitalization: TextCapitalization.words,
+                validator: (v) => (v == null || v.isEmpty) ? "Campo obrigatório" : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                decoration: _buildInputDecoration(
+                  labelText: 'E-mail (CRM ou Institucional)',
+                  icon: Icons.alternate_email_outlined,
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) {
+                    if (v == null || v.isEmpty) return "Campo obrigatório";
+                    if (!v.contains('@')) return "E-mail inválido";
+                    return null;
+                  },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                decoration: _buildInputDecoration(
+                  labelText: 'Senha (mín. 6 caracteres)',
+                  icon: Icons.lock_outline,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    ),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
-          ],
+                ),
+                obscureText: _obscurePassword,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return "Campo obrigatório";
+                  if (v.length < 6) return "Senha muito curta";
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _confirmPasswordController,
+                decoration: _buildInputDecoration(
+                  labelText: 'Confirmar Senha',
+                  icon: Icons.lock_clock_outlined,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    ),
+                    onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  ),
+                ),
+                obscureText: _obscureConfirmPassword,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return "Campo obrigatório";
+                  if (v != _passwordController.text) return "As senhas não coincidem";
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+
+              if (_errorMessage != null)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade400)
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 24),
+
+              ElevatedButton(
+                onPressed: _isLoading ? null : _register,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : const Text('Criar Conta'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -49,12 +49,6 @@ class _InsulinCalculatorPageState extends State<InsulinCalculatorPage> {
   void _saveCase() {
     if (_calculationResult == null) return;
     
-    // TODO: Chamar o CaseService para salvar no Firestore
-    // 1. Criar o CaseService
-    // 2. Chamar: caseService.saveCase(caseData, calculationResult);
-    // 3. Salvar na coleção /cases
-    // 4. Salvar na coleção /consultations (histórico)
-    
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Medição salva com sucesso!"))
     );

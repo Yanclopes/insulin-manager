@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:insulinmanager/core/models/patient_model.dart';
 
@@ -5,17 +6,24 @@ class PatientService {
   final CollectionReference _patientsCollection =
       FirebaseFirestore.instance.collection('patients');
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String? get currentUserId => _auth.currentUser?.uid;
+
   Stream<List<PatientModel>> getAllPatientsStream() {
+    final userId = currentUserId;
+
     return _patientsCollection
+        .where('profissionalUid', isEqualTo: userId) 
         .snapshots()
         .map((snapshot) {
       try {
         return snapshot.docs
             .map((doc) =>
-                PatientModel.fromMap(doc.data() as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        print("Erro no stream de pacientes: $e");
+                PatientModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          .toList();
+      } catch (e){
         return [];
       }
     });
@@ -29,7 +37,6 @@ class PatientService {
       await docRef.set(patientData);
 
     } catch (e) {
-      print("Erro ao adicionar paciente: $e");
       throw Exception("Falha ao salvar paciente.");
     }
   }
@@ -38,7 +45,6 @@ class PatientService {
     try {
       await _patientsCollection.doc(patient.id).update(patient.toMap());
     } catch (e) {
-      print("Erro ao atualizar paciente: $e");
       throw Exception("Falha ao atualizar paciente.");
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:insulinmanager/core/widgets/auth_wrapper.dart';
 import 'firebase_options.dart'; 
 
@@ -8,6 +9,13 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  firestore.settings = const Settings(
+    persistenceEnabled: true
+  );
+
   runApp(const MyApp());
 }
 
@@ -20,7 +28,7 @@ class MyApp extends StatelessWidget {
     final Color corPrimaria = Colors.teal;
     
     return MaterialApp(
-      title: 'SBD-Assist',
+      title: 'InsuGuia',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

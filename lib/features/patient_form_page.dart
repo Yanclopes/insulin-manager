@@ -1,8 +1,8 @@
-// features/patient_form_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:insulinmanager/core/models/patient_model.dart';
 import 'package:insulinmanager/core/services/patient_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PatientFormPage extends StatefulWidget {
@@ -14,7 +14,6 @@ class PatientFormPage extends StatefulWidget {
 }
 
 class _PatientFormPageState extends State<PatientFormPage> {
-  // ... (variáveis de controller, initState, dispose, etc. não mudam)
   final PatientService _patientService = PatientService();
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
@@ -24,7 +23,9 @@ class _PatientFormPageState extends State<PatientFormPage> {
   late TextEditingController _heightController;
   late TextEditingController _a1cController;
   String _selectedRenalStatus = 'Normal';
-  String _selectedGender = 'M';
+  String _selectedGender      = 'M';
+  String currentUserId        = FirebaseAuth.instance.currentUser?.uid ?? '';
+
   bool _isLoading = false;
   bool get _isEditing => widget.patient != null;
 
@@ -43,7 +44,11 @@ class _PatientFormPageState extends State<PatientFormPage> {
 
   @override
   void dispose() {
-    // ... (dispose de todos os controllers)
+    _nameController.dispose();
+    _ageController.dispose();
+    _diabetesTypeController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
     super.dispose();
   }
   
@@ -58,24 +63,67 @@ class _PatientFormPageState extends State<PatientFormPage> {
     );
   }
 
-  // Função _savePatient (sem mudança na lógica, apenas no snackbar)
+  
   Future<void> _savePatient() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     setState(() => _isLoading = true);
-    // ... (lógica de parse e criação do modelo)
-    // ...
+
     try {
-      // ... (lógica de update/add)
+      if (_isEditing) {
+        final updatedPatient = PatientModel(
+          id: widget.patient!.id,
+          name: _nameController.text.trim(),
+          age: int.parse(_ageController.text),
+          gender: _selectedGender,
+          diabetesType: _diabetesTypeController.text.trim(),
+          createdAt: widget.patient!.createdAt,
+          weight: num.parse(_weightController.text.trim().replaceAll(',', '.')),
+          height: num.parse(_heightController.text.trim().replaceAll(',', '.')),
+          a1c: num.parse(_a1cController.text.trim().replaceAll(',', '.')),
+          renalFunctionStatus: _selectedRenalStatus,
+          profissionalUid: currentUserId
+        );
+
+        await _patientService.updatePatient(updatedPatient);
+      } else {
+        final newPatient = PatientModel(
+          id: '', 
+          name: _nameController.text.trim(),
+          age: int.parse(_ageController.text),
+          gender: _selectedGender,
+          diabetesType: _diabetesTypeController.text.trim(),
+          createdAt: Timestamp.now(),
+          weight: num.parse(_weightController.text.trim().replaceAll(',', '.')),
+          height: num.parse(_heightController.text.trim().replaceAll(',', '.')),
+          a1c: num.parse(_a1cController.text.trim().replaceAll(',', '.')),
+          renalFunctionStatus: _selectedRenalStatus,
+          profissionalUid: currentUserId
+        );
+
+        await _patientService.addPatient(newPatient);
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Paciente salvo com sucesso!")), // Texto simplificado
+          SnackBar(
+              content: Text(
+                  "Paciente salvo${_isEditing ? ' (editado)' : ''} com sucesso!")),
         );
         Navigator.pop(context);
       }
     } catch (e) {
-      // ... (tratamento de erro)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao salvar paciente: $e")),
+        );
+      }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -84,7 +132,6 @@ class _PatientFormPageState extends State<PatientFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Título atualizado
         title: Text(_isEditing ? "Editar Paciente" : "Novo Paciente"),
       ),
       body: SingleChildScrollView(
@@ -137,7 +184,6 @@ class _PatientFormPageState extends State<PatientFormPage> {
               ),
               const SizedBox(height: 16),
               
-              // Label atualizada
               TextFormField(
                 controller: _a1cController,
                 decoration: _buildInputDecoration(
@@ -150,7 +196,6 @@ class _PatientFormPageState extends State<PatientFormPage> {
               ),
               const SizedBox(height: 16),
 
-              // Label atualizada
               const Text("Status Renal", style: TextStyle(fontSize: 12, color: Colors.black54)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),

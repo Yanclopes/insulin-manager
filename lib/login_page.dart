@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "SBD-Assist",
+                  "InsuGuia",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _emailController,
                   decoration: _buildInputDecoration(
-                    labelText: "E-mail (CRM ou Institucional)",
+                    labelText: "E-mail",
                     icon: Icons.alternate_email_outlined,
                   ),
                   keyboardType: TextInputType.emailAddress,

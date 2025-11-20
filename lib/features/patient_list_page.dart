@@ -4,6 +4,7 @@ import 'package:insulinmanager/core/services/patient_service.dart';
 import 'package:insulinmanager/features/patient_form_page.dart';
 import 'package:insulinmanager/features/measurement_form_page.dart';
 import 'package:insulinmanager/features/report_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PatientListPage extends StatefulWidget {
   const PatientListPage({Key? key}) : super(key: key);
@@ -158,11 +159,32 @@ class _PatientListPageState extends State<PatientListPage> {
     }
   }
 
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);      
+    } catch (e) {
+      print("Erro ao fazer logout: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Erro ao sair. Tente novamente.")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pacientes"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: "Sair da conta",
+            onPressed: _logout,
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Column(
         children: [
